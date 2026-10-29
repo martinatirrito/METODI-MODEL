@@ -16,6 +16,32 @@ class Controller:
             self._view._ddEmployee.options.append(ft.dropdown.Option(e))
         self._view.update_page()
 
+    def fillDDCliente(self):
+        self._view._ddClienti.options.clear()  # svuota se rifai "Crea Grafo"
+        for c in self._model.getClienti():
+            self._view._ddClienti.options.append(
+                ft.dropdown.Option(key=str(c.CustomerId), text=f"{c.FirstName} {c.LastName}"))
+        self._view.update_page()
+
+""" ALL'INIZIO DELL'HANDLER DEL BOTTONE IN CUI VOGLIO STAMPARE UNA COSA COME GET SUCCESSORI O RAGGIUNGIBILI
+
+idCliente = self._view._ddClienti.value        # stringa, es. "1"
+if idCliente is None:
+    self._view.create_alert("Seleziona un cliente.")
+    return
+source = self._model._idMapC[int(idCliente)]   # da id a oggetto nodo
+
+lista = self._model.getSuccessori(source)
+num = self._model.getNumRaggiungibili(source)
+
+ogni volta che un metodo del model ha bisogno di un nodo scelto dall’utente da un dropdown. 
+In pratica succede quando la traccia dice “selezionato un cliente/artista/album dal menu, calcola...”. 
+Tipicamente lo chiedono i successori, i nodi raggiungibili, le visite BFS/DFS, il cammino tra due nodi e 
+la ricorsione che parte da un nodo.
+"""
+
+
+
     def handleCreaGrafo(self, e):
         employee = self._view._ddEmployee.value
 
@@ -39,6 +65,7 @@ class Controller:
             self._view.txt_result.controls.append(
                 ft.Text(f"Numero di archi: {Narchi}")
             )
+            self.fillDDCliente()
 
             self._view._page.update()
 
@@ -103,29 +130,43 @@ class Controller:
                 self._view.txt_result.controls.append(ft.Text(str(c)))
 
         #SUCCESSORI
-            lista = self._model.getSuccessori()
+            lista = self._model.getSuccessori(self._view._ddClienti.value)
             self._view.txt_result.controls.append(ft.Text(f"I successori sono {len(lista)}"))
             for s in lista:
                 self._view.txt_result.controls.append(ft.Text(str(s)))
 
         #RAGGIUNGIBILI
-            numeroNodiRaggiungibili = self._model.getNumRaggiungibili()
+            numeroNodiRaggiungibili = self._model.getNumRaggiungibili(self._view._ddClienti.value)
             self._view.txt_result.controls.append(ft.Text(f"I nodi raggiungibili sono {numeroNodiRaggiungibili}"))
 
         #RAGGIUNGIBILI CON VISITA
-        """
+            """
             nodi = self._model.getBFSNodesFromEdges(source) #IL SOURCE SARA IL MIO VALORE DEL NODO
             self._view.txt_result.controls.append(
                 ft.Text(f"Visita in ampiezza da {source.FirstName}: {len(nodi)} nodi", color="red"))
             for i, n in enumerate(nodi, start=1):
                 self._view.txt_result.controls.append(ft.Text(f"{i}. {n.FirstName} {n.LastName}"))
             self._view.update_page()
-        """
+            """
 
-            
+        #NODI ISOLATI
+            nodiIsolati = self._model.getNodiIsolati()
+
+            self._view.txt_result.controls.append(ft.Text(f"I nodi sono isolati sono:", color = "red"))
+            if not nodiIsolati :
+                self._view.txt_result.controls.append(ft.Text(f"non ci sono nodi isolati", color = "red"))
+            else:
+                for n in nodiIsolati:
+                    self._view.txt_result.controls.append(ft.Text(str(n)))
+
+            numNodiIsolati = self._model.getNumIsolati()
+            self._view.txt_result.controls.append(ft.Text(f"I nodi isolati sono: {numNodiIsolati}", color = "red"))
+
+
+
             self._view.update_page()
 
-    except Exception as ex:
-        traceback.print_exc()
-        self._view.create_alert(f"Errore nella stampa delle info: {ex}")
+        except Exception as ex:
+            traceback.print_exc()
+            self._view.create_alert(f"Errore nella stampa delle info: {ex}")
 

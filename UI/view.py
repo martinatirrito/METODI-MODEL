@@ -28,8 +28,10 @@ class View(ft.UserControl):
         self._controller.fillDDEmployee()
         self._btnCreaGrafo = ft.ElevatedButton(text="Crea Grafo", on_click=self._controller.handleCreaGrafo)
         self._btnstampa = ft.ElevatedButton(text="Stampa dettagli", on_click=self._controller.handleSampaInfo, disabled = True)
+        self._ddClienti = ft.Dropdown(label="Cliente")
+        self._controller.fillDDCliente()
 
-        row1 = ft.Row([self._ddEmployee, self._btnCreaGrafo, self._btnstampa],
+        row1 = ft.Row([self._ddEmployee, self._btnCreaGrafo, self._btnstampa, self._ddClienti],
                       alignment=ft.MainAxisAlignment.CENTER)
         self._page.controls.append(row1)
 
